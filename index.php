@@ -11,5 +11,8 @@
     <h3>ธนภัทร อัคศรี (DODO)</h3>
     <h3>Thanapat Aksri (DODO)</h3>
     <hr/>
+    <h3>ธนวัฒน์ หลงเหลือขาติ (เพชร)</h3>
+    <h3>Thanawat Longluaechat (petch)</h3>
+    <hr/>
 </body>
 </html>
