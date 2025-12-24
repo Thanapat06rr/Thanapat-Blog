@@ -61,11 +61,11 @@ class Core
         }
     }
     
-    public function fetch($sql)
+    public function fetch($sql, $where = [])
     {
         try {
             $stmt = $this->conn->prepare($sql);
-            $stmt->execute();
+            $stmt->execute($where);
             return $stmt->fetchAll();
         } catch (PDOException $e) {
             return ["status" => "error", "message" => "เกิดข้อผิดพลาด", "error" => $e->getMessage()];
