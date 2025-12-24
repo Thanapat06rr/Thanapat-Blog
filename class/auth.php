@@ -16,9 +16,11 @@ class Auth
             $stmt = $this->conn->prepare("SELECT * FROM users WHERE username = ?");
             $stmt->execute([$username]);
             $user = $stmt->fetch();
-            if($user){
-                $stmt = $this->conn->prepare("INSERT INTO users(username, password)VALUES(?, ?)");
-                $stmt->execute($username, $password);
+
+            // password_verify($password, $user['password']);5
+            if($user && password_verify($password, $user['password'])){
+                $_SESSION['user_login'] = $user['id'];
+                $_SESSION['username'] = $user['username'];
                 return ["status" => "success", "message" => "เข้าสู่ระบบสำเร็จ"];
             }else{
                 return ["status" => "error", "message" => "ชื่อผู้ใช้งาน หรือ รหัสผ่านไม่ถูกต้อง"];
