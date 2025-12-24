@@ -1,92 +1,175 @@
-<?php 
+<?php
+session_start();
+if (!isset($_SESSION['user_login'])) {
+    header("Location: /Thanapat-Blog/");
+    exit;
+}
+require_once 'modal.php';  
+require_once 'navbar.php';  
 require_once __DIR__ . '/../../class/Core.php';
 $core = new Core();
 
 $user_id = $_SESSION['user_login'];
-$result = $core->fetch("SELECT * FROM blogs WHERE user_id = ?", [$user_id]);
-// var_dump($result);
+$blogs = $core->fetch("SELECT * FROM blogs WHERE user_id = ?", [$user_id]);
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <title>My Blog Dashboard</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <script src="./package/jq.js"></script>
+    <script src="./package/core.js"></script>
+
+    <style>
+        body { 
+            background-color: #f8f9fa; 
+            font-family: 'Sarabun', sans-serif; 
+        }
+        .navbar-brand {
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .blog-card { 
+            transition: all 0.2s ease-in-out; 
+            border: none; 
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); 
+            background: #fff;
+        }
+
+        .text-truncate-2 { 
+            display: -webkit-box; 
+            -webkit-line-clamp: 2; 
+            -webkit-box-orient: vertical; 
+            overflow: hidden; 
+        }
+    </style>
 </head>
 
 <body>
-    <?php foreach ($result as $re): ?>
-        <h1><?= $re['id'] ?></h1>
-        <h1><?= $re['title'] ?></h1>
-        <h1><?= $re['description'] ?></h1>
-    <?php endforeach ?>
-        
-<div class="d-flex flex-column justify-content-center" style="min-height:100vh;">
-    <h1 class="text-center display-4 mb-4">BlogAdd</h1>
-    <form action="./controller/blog.controller.php" method="post"
-          class="d-flex flex-column justify-content-center">
-
-
-
-    
-<div class="row justify-content-center">
-    <div class="col-md-8 col-lg-4">
-        <div class="form-floating mb-3">
-            <input type="text" class="form-control" name="title" placeholder="ชื่อบทความ">
-            <label>กรุณาเพิ่มสิ่งที่คุณคิด</label>
+    <div class="container pb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <h2 class="fw-bold m-0 text-secondary h3">
+                <i class="bi bi-grid-fill me-2"></i>บทความของคุณ
+            </h2>
+            <button class="btn btn-primary shadow-sm" onclick="openModal('create')">
+                <i class="bi bi-plus-lg me-2"></i>เขียนบทความใหม่
+            </button>
         </div>
 
-        <div class="form-floating mb-3">
-            <textarea class="form-control" name="description" placeholder="รายละเอียดบทความ"></textarea>
-            <label>กรุณาเพิ่มสิ่งที่คุณคิด</label>
-        </div>
+        <?php if (count($blogs) > 0): ?>
+            <div class="row g-3 g-md-4">
+                <?php foreach ($blogs as $blog): ?>
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <div class="card blog-card h-100 p-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class=" pe-2" style="width: 230px;">
+                                        <h5 class="card-title fw-bold text-primary"><?= htmlspecialchars($blog['title']) ?></h5>
+                                        <p class="card-text text-muted text-truncate-2"><?= htmlspecialchars($blog['description']) ?></p>
+                                    </div>
+                                    <div>
+                                        <a href="./?page=detail&id=<?= $blog['id'] ?>" class="btn btn-outline-info btn-sm flex-shrink-0" title="ดูรายละเอียด">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center pt-0">
+                                <small class="text-muted" style="font-size: 0.85rem;">
+                                    <i class="bi bi-clock me-1"></i><?= $blog['created_at'] ?>
+                                </small>
+                                
+                                <div class="card-actions">
+                                    <button class="btn btn-outline-warning btn-sm me-1" onclick='openModal("edit", <?= json_encode($blog) ?>)' title="แก้ไข">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-outline-danger btn-sm" onclick="deleteBlog(<?= $blog['id'] ?>)" title="ลบ">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach ?>
+            </div>
+        <?php else: ?>
+            <div class="text-center py-5 text-muted">
+                <div class="mb-3">
+                    <i class="bi bi-journal-x" style="font-size: 4rem; opacity: 0.5;"></i>
+                </div>
+                <h4>ยังไม่มีบทความ</h4>
+            </div>
+        <?php endif; ?>
     </div>
-</div>
 
-
-    <input type="hidden" name="action" value="create_blog">
-
-<div class="text-center">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <button type="submit" class="btn btn-success px-4">
-        ยืนยัน
-    </button>
-</div>
-</div>
-
-
-    </form>
     <script>
-        $(document).ready(function() {
-            $("#blogAdd").submit(function(e) {
-                e.preventDefault();
-                $.ajax({
-                    type: "POST",
-                    url: "./controller/blog.controller.php",
-                    data: {
-                        title: $("#title").val(),
-                        description: $("#description").val(),
-                        action: "create_blog"
-                    },
-                    dataType: "json",
-                    success: function(response) {
-                        if (response.status == "success") {
-                            alert("เพิ่มบทความสำเร็จ");
-                            $("#title").val("");
-                            $("#description").val("");
-                        } else {
-                            alert(response.message);
-                        }
+        const API_URL = "./controller/blog.controller.php";
+        const blogModal = new bootstrap.Modal(document.getElementById('blogModal'));
+
+        function openModal(mode, data = null) {
+            if (mode === 'create') {
+                $('#modalTitle').text('เพิ่มบทความ');
+                $('#form_action').val('create_blog');
+                $('#blog_id').val('');
+                $('#blogForm')[0].reset();
+            } else if (mode === 'edit') {
+                $('#modalTitle').text('แก้ไขบทความ');
+                $('#form_action').val('update_blog');
+                $('#blog_id').val(data.id);
+                $('#title').val(data.title);
+                $('#description').val(data.description);
+            }
+            blogModal.show();
+        }
+
+        $('#blogForm').submit(function(e) {
+            e.preventDefault();
+            let formData = $(this).serialize();
+            $.ajax({
+                type: "POST",
+                url: API_URL,
+                data: formData,
+                dataType: "json",
+                success: function(res) {
+                    if (res.status === 'success') {
+                        window.location.reload();
+                    } else {
+                        showMyToast(res.message, 'error');
                     }
-                });
+                },
+                error: function(res) {
+                    console.log(res);
+                    showMyToast("เกิดข้อผิดพลาด", 'error');
+                }
             });
         });
+
+        function deleteBlog(id) {
+            if (!confirm("คุณต้องการลบบทความนี้ใช่หรือไม่?")) return;
+            $.ajax({
+                type: "POST",
+                url: API_URL,
+                data: { action: 'delete_blog', id: id },
+                dataType: "json",
+                success: function(res) {
+                    if (res.status === 'success') {
+                        window.location.reload();
+                    } else {
+                        showMyToast(res.message, 'error');
+                    }
+                }
+            });
+        }
     </script>
 </body>
-ิ
-
 </html>

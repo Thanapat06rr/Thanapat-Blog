@@ -10,46 +10,19 @@ class Core
         $this->conn = $db->getDB();
     }
 
-    // public function Insert(array $data, string $table)
-    // {
-    //     try {
-    //         $stmt = $this->conn->prepare("");
-    //     } catch (PDOException $e) {
-    //     }
-    // }
-
-    // public function Update()
-    // {
-    //     try {
-    //     } catch (PDOException $e) {
-    //     }
-    // }
-
-    // public function Fetch($sql, $param = [], $fetch = null)
-    // {
-    //     try {
-    //         $stmt = $this->conn->prepare($sql);
-    //         $stmt->execute($param);
-    //         if ($fetch === 'fetch') {
-    //             return $stmt->fetch();
-    //         } else {
-    //             return $stmt->fetchAll();
-    //         }
-    //     } catch (PDOException $e) {
-    //         return ["status" => "error", "message" => "เกิดข้อผิดพลาด", "error" => $e->getMessage()];
-    //     }
-    // }
-
+    // ฟังชั่น ลบข้อมูล
     public function Delete($table, $id)
     {
         try {
             $stmt = $this->conn->prepare("DELETE FROM $table WHERE id = ?");
             $stmt->execute([$id]);
+            return ["status" => "success", "message" => "ลบข้อมูลสำเร็จ"];
         } catch (PDOException $e) {
             return ["status" => "error", "message" => "เกิดข้อผิดพลาด", "error" => $e->getMessage()];
         }
     }
 
+    // ฟังชั่น query - จัดการเกี่ยวกับฐานข้อมูล โดยรีบค่าจากparam sql
     public function query($sql, $where = [])
     {
         try {
@@ -60,7 +33,8 @@ class Core
             return ["status" => "error", "message" => "เกิดข้อผิดพลาด", "error" => $e->getMessage()];
         }
     }
-    
+
+    // ฟังชั่น ดึงข้อมูล
     public function fetch($sql, $where = [])
     {
         try {
@@ -70,5 +44,28 @@ class Core
         } catch (PDOException $e) {
             return ["status" => "error", "message" => "เกิดข้อผิดพลาด", "error" => $e->getMessage()];
         }
+    }
+
+    // ฟังชั่น ตรวจสอบความถูกต้องของ ข้อมูล
+    public function validate($data)
+    {
+        foreach ($data as $value) {
+            $val = trim($value);
+            if (empty($val)) {
+                return [
+                    "status" => "error",
+                    "message" => "กรุณากรอกข้อมูลให้ครบ"
+                ];
+            }
+
+            if (!preg_match('/^[a-zA-Z0-9ก-๙\s.,?!_\-()"\']+$/u', $val)) {
+                return [
+                    "status" => "error",
+                    "message" => "กรุณากรอกโดยไม่มีอักษรพิเศษ"
+                ];
+            }
+        }
+
+        return ["status" => "success"];
     }
 }

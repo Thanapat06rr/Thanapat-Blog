@@ -5,18 +5,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
     <script src="./package/jq.js"></script>
+    <script src="./package/core.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 </head>
 
-<body style="background: #EEAECA;
-background: radial-gradient(circle, rgba(238, 174, 202, 1) 0%, rgba(148, 187, 233, 1) 100%);">
+<style>
+    .card {
+        border-radius: 15px;
+    }
+</style>
+
+<body>
 
     <div class="container d-flex justify-content-center align-items-center vh-100">
-        <div class="card p-4 shadow-sm" style="width: 100%; max-width: 400px;">
+        <div class="card p-4 shadow-sm" style="width: 100%; height: 350px; max-width: 500px;">
             <div class="text-center">
-                <h1 class="mb-4">เข้าสู่ระบบ</h1>
+                <h1 class="mb-4 h3">เข้าสู่ระบบ</h1>
                 <form id="login">
                     <div class="mb-3">
                         <input type="text" id="login_username" class="form-control" placeholder="ชื่อผู้ใช้">
@@ -36,7 +41,49 @@ background: radial-gradient(circle, rgba(238, 174, 202, 1) 0%, rgba(148, 187, 23
         </div>
     </div>
 
-    <div class="modal fade" id="modal-register" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="modal-register">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header pb-4 p-5 border-bottom-0">
+                    <h5 class="fs-5">ลงทะเบียนสมัครสมาชิก</h5>
+                    <button class="btn-close" data-bs-dismiss="modal" aria-label="close"></button>
+                </div>
+
+                <div class="modal-body p-5 pt-0">
+                    <form id="register" method="post">
+                        <div class="row g-2 mb-3">
+
+                            <div class="col-md-12 form-floating">
+                                <input type="text" class="form-control" id="fname" placeholder="ชื่อผู้ใช้งาน">
+                                <label for="">ชื่อ</label>
+                            </div>
+
+                            <div class="col-md-12 form-floating">
+                                <input type="text" class="form-control" id="lname" placeholder="รหัสผ่าน">
+                                <label for="">นามสกุล</label>
+                            </div>
+                            <div class="col-md-6 form-floating">
+                                <input type="text" class="form-control" id="username" placeholder="ชื่อผู้ใช้งาน">
+                                <label for="">ชื่อผู้ใช้งาน</label>
+                            </div>
+
+                            <div class="col-md-6 form-floating">
+                                <input type="password" class="form-control" id="password" placeholder="รหัสผ่าน">
+                                <label for="">รหัสผ่าน</label>
+                            </div>
+
+                        </div>
+
+                        <button type="submit" name="signup" class="btn btn-primary w-100">
+                            ลงทะเบียนสมัครสมาชิก
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- <div class="modal fade" id="" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -53,7 +100,7 @@ background: radial-gradient(circle, rgba(238, 174, 202, 1) 0%, rgba(148, 187, 23
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
 
     <script>
@@ -71,65 +118,40 @@ background: radial-gradient(circle, rgba(238, 174, 202, 1) 0%, rgba(148, 187, 23
                     dataType: "json",
                     success: function(response) {
                         if (response.status == "success") {
-                            window.location.href = "./?page=blog";
+                            showMyToast(response.message, 'success');
+                            setTimeout(() => {
+                                window.location.href = "./?page=blog";
+                            }, 500)
                         } else {
-                            alert(response.message);
+                            showMyToast(response.message, 'error');
+                            // alert(response.message);
                         }
                     }
                 });
             });
-        });
-        $(document).ready(function() {
             $("#register").submit(function(e) {
                 e.preventDefault();
                 $.ajax({
                     type: "POST",
                     url: "./controller/auth.controller.php",
                     data: {
-                        fname: $("#reg_fname").val(),
-                        lname: $("#reg_lname").val(),
-                        username: $("#reg_username").val(),
-                        password: $("#reg_password").val(),
+                        fname: $("#fname").val(),
+                        lname: $("#lname").val(),
+                        username: $("#username").val(),
+                        password: $("#password").val(),
                         action: "register"
                     },
                     dataType: "json",
                     success: function(response) {
                         if (response.status == "success") {
-                            alert("สมัครสมาชิกสำเร็จ");
-                            $("#reg_fname").val("");
-                            $("#reg_lname").val("");
-                            $("#reg_username").val("");
-                            $("#reg_password").val("");
+                            showMyToast(response.message, 'success');
+                            $('#modal-register').modal('hide');
+                            $("#fname").val("");
+                            $("#lname").val("");
+                            $("#username").val("");
+                            $("#password").val("");
                         } else {
-                            alert(response.message);
-                        }
-                    }
-                });
-            });
-        });
-        $(document).ready(function() {
-            $("#register").submit(function(e) {
-                e.preventDefault();
-                $.ajax({
-                    type: "POST",
-                    url: "./controller/auth.controller.php",
-                    data: {
-                        fname: $("#reg_fname").val(),
-                        lname: $("#reg_lname").val(),
-                        username: $("#reg_username").val(),
-                        password: $("#reg_password").val(),
-                        action: "register"
-                    },
-                    dataType: "json",
-                    success: function(response) {
-                        if (response.status == "success") {
-                            alert("สมัครสมาชิกสำเร็จ");
-                            $("#reg_fname").val("");
-                            $("#reg_lname").val("");
-                            $("#reg_username").val("");
-                            $("#reg_password").val("");
-                        } else {
-                            alert(response.message);
+                            showMyToast(response.message, 'error');
                         }
                     }
                 });
