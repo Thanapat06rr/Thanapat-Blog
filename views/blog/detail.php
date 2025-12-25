@@ -1,10 +1,9 @@
 <?php
 session_start();
 if (!isset($_SESSION['user_login'])) {
-    header("Location: ../login.php");
+    header("Location: /Thanapat-Blog/");
     exit;
 }
-
 if (!isset($_GET['id'])) {
     header("Location: index.php");
     exit;
