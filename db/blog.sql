@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Dec 22, 2025 at 02:59 PM
+-- Generation Time: Dec 25, 2025 at 02:27 AM
 -- Server version: 8.0.30
 -- PHP Version: 8.1.10
 
@@ -30,8 +30,8 @@ SET time_zone = "+07:00";
 CREATE TABLE `blogs` (
   `id` int NOT NULL,
   `user_id` int NOT NULL,
-  `title` varchar(100) NOT NULL,
-  `description` text NOT NULL,
+  `title` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `description` text COLLATE utf8mb4_general_ci NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -43,20 +43,12 @@ CREATE TABLE `blogs` (
 
 CREATE TABLE `users` (
   `id` int NOT NULL,
-  `fname` varchar(100) NOT NULL,
-  `lname` varchar(100) NOT NULL,
-  `username` varchar(100) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `role` enum('admin','user') NOT NULL DEFAULT 'user',
+  `fname` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `lname` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `username` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `users`
---
-
-INSERT INTO `users` (`id`, `fname`, `lname`, `username`, `password`, `role`, `created_at`) VALUES
-(1, 'admin', 'admin', 'admin', '1234', 'admin', '1999-12-31 17:00:00');
 
 --
 -- Indexes for dumped tables
@@ -90,7 +82,7 @@ ALTER TABLE `blogs`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables
