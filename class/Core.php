@@ -58,7 +58,7 @@ class Core
                 ];
             }
 
-            if (!preg_match('/^[a-zA-Z0-9ก-๙\s.,?!_\-()\]+$/u', $val)) {
+            if (!preg_match('/^[a-zA-Z0-9ก-๙\s.,?!_\-()"\']+$/u', $val)) {
                 return [
                     "status" => "error",
                     "message" => "กรุณากรอกโดยไม่มีอักษรพิเศษ"
